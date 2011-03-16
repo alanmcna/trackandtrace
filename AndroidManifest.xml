@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="nz.net.catalyst.TrackAndTrace"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application android:icon="@drawable/logo" android:label="@string/label" android:debuggable="true">
+  	    <activity android:name=".search.SearchFormActivity" 
+  	    			android:label="@string/searchform" >
+            <intent-filter>
+                <action android:name="nz.net.catalyst.TrackAndTrace.search.SearchFormActivity" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+  	    <activity android:name=".search.SearchResultsActivity" 
+  	    			android:configChanges="orientation"
+  	    			android:label="@string/searchresults" >
+            <intent-filter>
+                <action android:name="nz.net.catalyst.TrackAndTrace.search.SearchResultsActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+   		<activity android:name="nz.net.catalyst.TrackAndTrace.EditPreferences"
+			android:label="@string/menu_preferences" />
+
+    </application>
+    <uses-sdk android:minSdkVersion="3" />
+    <!-- permissions -->
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+
+</manifest> 

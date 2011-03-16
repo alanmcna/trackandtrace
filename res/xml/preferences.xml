@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<EditTextPreference
+		android:key="@string/pref_base_url_key"
+		android:title="@string/pref_base_url_title"
+		android:summary="@string/pref_base_url_summary"
+		android:defaultValue="@string/base_url" />	
+
+	<EditTextPreference
+		android:key="@string/pref_saved_key"
+		android:title="@string/pref_saved_title"
+		android:summary="@string/pref_saved_summary"
+		android:defaultValue="" />	
+
+<!-- 
+	<EditTextPreference
+		android:key="@string/pref_search_boxes_key"
+		android:title="@string/pref_search_boxes_title"
+		android:summary="@string/pref_search_boxes_summary"
+		android:defaultValue="@string/search_boxes" />	
+ -->
+</PreferenceScreen>

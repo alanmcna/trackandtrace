@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NZPost - Track and Trace</string>
+    <string name="label">NZPost - Track and Trace</string>
+
+    <string name="searchresults">Search Results</string>
+    <string name="itemdetails">Details</string>
+
+    <string name="menu_preferences">Settings</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_info">Info</string>
+    <string name="menu_login">Login</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_reset">Reset</string>
+    <string name="menu_scan">Scan</string>
+    
+    <string name="prefcat_advanced">Advanced</string>
+    <string name="prefcat_debug">Debugging</string>
+
+    <string name="pref_base_url_key">base.url</string>
+    <string name="pref_base_url_title">Base URL</string>
+    <string name="pref_base_url_summary">Enter the base Track and Trace Search URL.</string>
+    <string name="base_url">http://services.nzpost.co.nz/NZP/NZPostTracking.svc/TrackIDs/1_0/</string>
+
+    <string name="pref_saved_key">Saved</string>
+    <string name="pref_saved_title">Saved Items</string>
+    <string name="pref_saved_summary">Saved Tracking Numbers (comma separated).</string>
+
+
+    <string name="pref_search_boxes_key">search.boxes</string>
+    <string name="pref_search_boxes_title">Search Boxes</string>
+    <string name="pref_search_boxes_summary">Enter the number of search boxes to appear on the search form.</string>
+    <string name="search_boxes">5</string>
+
+    <string name="searchform">Search</string>
+    <string name="search_inprogress">Searching ...</string>
+    <string name="search_form_go">Run search</string>
+   
+    <!--  Error strings -->
+    <string name="search_bad_request">Sorry, bad request!</string>
+    <string name="search_url_invalid">The URL you have entered is invalid.</string>
+    <string name="search_connection_failure">Sorry the search failed due to a connection problem.</string>
+    <string name="search_no_results">Sorry the search returned no results.</string>
+    <string name="search_no_search_terms">Sorry, no search terms entered.</string>
+    <string name="scan_no_free_input_field">Sorry there are no free input fields to put the scan results.</string>
+        
+    <string name="load_config_download_error">Sorry there was an error downloading the configuration file.</string>
+    <string name="load_config_error">Sorry there was an error parsing the configuration file.</string>
+    <string name="load_config_success">Successfully loaded the configuration file.</string>
+    <string name="scan_not_available">Sorry you need to install ZXing Barcode Scanner for this.</string>
+    
+</resources>
