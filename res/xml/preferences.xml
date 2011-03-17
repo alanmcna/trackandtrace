@@ -15,11 +15,9 @@
 		android:summary="@string/pref_saved_summary"
 		android:defaultValue="" />	
 
-<!-- 
 	<EditTextPreference
 		android:key="@string/pref_search_boxes_key"
 		android:title="@string/pref_search_boxes_title"
 		android:summary="@string/pref_search_boxes_summary"
 		android:defaultValue="@string/search_boxes" />	
- -->
 </PreferenceScreen>

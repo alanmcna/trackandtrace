@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,13 +24,11 @@ import nz.net.catalyst.TrackAndTrace.search.SearchFormActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -41,7 +38,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 
-public class EditPreferences extends PreferenceActivity implements OnSharedPreferenceChangeListener, OnClickListener {
+public class EditPreferences extends PreferenceActivity implements OnClickListener {
 	static final String TAG = LogConfig.getLogTag(EditPreferences.class);
 	// whether DEBUG level logging is enabled (whether globally, or explicitly for this log tag)
 	static final boolean DEBUG = LogConfig.isDebug(TAG);
@@ -53,19 +50,6 @@ public class EditPreferences extends PreferenceActivity implements OnSharedPrefe
 		super.onCreate(savedInstanceState);
 
 		addPreferencesFromResource(R.xml.preferences);
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-		prefs.registerOnSharedPreferenceChangeListener(this);
-	}
-	
-	@Override
-	protected void onDestroy() {
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		prefs.unregisterOnSharedPreferenceChangeListener(this);
-		
-		super.onDestroy();
 	}
 	
 	@Override
@@ -87,14 +71,6 @@ public class EditPreferences extends PreferenceActivity implements OnSharedPrefe
 				return true;
 			case Constants.SCAN:
 				startScan();
-//				try {
-//					Intent intent = new Intent(GlobalResources.CONFIG_SCAN_INTENT);
-//					intent.putExtra("SCAN_MODE", GlobalResources.CONFIG_SCAN_MODE);
-//					startActivityForResult(intent, 0);
-//			    } catch (ActivityNotFoundException e) {
-//		        	Toast.makeText(this, getResources().getString(R.string.scan_not_available), 
-//		        						Toast.LENGTH_SHORT).show();
-//			    }
 		    	return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -122,10 +98,6 @@ public class EditPreferences extends PreferenceActivity implements OnSharedPrefe
 		startActivity(new Intent(this, SearchFormActivity.class));
 		finish();
 		return true;
-	}
-	
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 	}
 	
 	
@@ -169,8 +141,6 @@ public class EditPreferences extends PreferenceActivity implements OnSharedPrefe
         	
 			if ( cx.parseConfig() ) {
 	        	Toast.makeText(this, getResources().getString(R.string.load_config_success), Toast.LENGTH_SHORT).show();
-	    		// refresh displayed values by restarting activity (a hack, but apparently there
-	    		// isn't a nicer way)
 	    		finish();
 	    		startActivity(getIntent());
 			} else {

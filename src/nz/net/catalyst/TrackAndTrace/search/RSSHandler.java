@@ -1,7 +1,6 @@
 package nz.net.catalyst.TrackAndTrace.search;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import nz.net.catalyst.TrackAndTrace.Constants;
 import nz.net.catalyst.TrackAndTrace.Event;
 import nz.net.catalyst.TrackAndTrace.Result;
 import nz.net.catalyst.TrackAndTrace.log.LogConfig;
@@ -23,7 +21,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 public class RSSHandler extends DefaultHandler {
 	static final String TAG = LogConfig.getLogTag(RSSHandler.class);

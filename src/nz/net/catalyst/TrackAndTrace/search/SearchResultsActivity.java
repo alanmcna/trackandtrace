@@ -28,9 +28,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,11 +37,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.LinearLayout.LayoutParams;
 
 public class SearchResultsActivity extends Activity {
@@ -323,8 +319,6 @@ public class SearchResultsActivity extends Activity {
 		        tv.setVisibility(View.VISIBLE);
 	        }
 
-	        // TODO loop through all the event history items and inflate a template and add it 
-	        //      to the view
 	        LinearLayout mContainer = (LinearLayout) convertView.findViewById(R.id.eventhistory);
 	        if(mContainer != null) {
         		mContainer.removeAllViews();

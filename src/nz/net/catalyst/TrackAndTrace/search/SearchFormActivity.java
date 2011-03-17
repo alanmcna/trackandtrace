@@ -8,14 +8,18 @@ import nz.net.catalyst.TrackAndTrace.EditPreferences;
 import nz.net.catalyst.TrackAndTrace.log.LogConfig;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -29,6 +33,9 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
 	static final boolean DEBUG = LogConfig.isDebug(TAG);
 	// whether VERBOSE level logging is enabled
 	static final boolean VERBOSE = LogConfig.VERBOSE;
+	
+	int boxes;
+	ViewGroup vg;
 	
 	SharedPreferences mPrefs;
 	
@@ -48,25 +55,52 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
         super.onCreate(savedInstanceState);
 
     	mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         setContentView(R.layout.search_form);
         
         // Set up click handlers for the text field and button
         ((Button) this.findViewById(R.id.btnSearchGo)).setOnClickListener(this);
+
+        loadSearchBoxes();
+    }
     
-        // Load saved stuff
+    private void loadSearchBoxes() {
+        boxes = Integer.parseInt(mPrefs.getString(getString(R.string.pref_search_boxes_key), 
+				Integer.toString(Constants.SEARCH_BOXES)));
+
+    	LayoutInflater infalInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        vg = (ViewGroup) findViewById(R.id.search_box_container);
+        if(vg != null) {
+    		vg.removeAllViews();
+	        vg.invalidate();
+        }
+
         String saved = mPrefs.getString(getString(R.string.pref_saved_key), "");
         String[] s = saved.split(",");
-        for (int i = 0; i < s.length; i++) {
-        	if ( s[i].trim().length() == 0 )
-        		continue;
-        	int id = getResources().getIdentifier("searchTerms" + ( i + 1 ), "id", getPackageName());
-        	if ( DEBUG ) Log.d(TAG, "loading saved [" + "searchTerms" + ( i + 1 ) + "] - " + id);
-	        EditText mText = (EditText) this.findViewById(id);
-			CheckBox chk = (CheckBox) findViewById(R.id.saveTerms1);
-			mText.setText(s[i]);
-			chk.setChecked(true);
+
+        // Inflate child view (search item)
+        for (int i = 0; i < boxes; i++) {
+        	View sb = infalInflater.inflate(R.layout.search_form_box, null);
+
+        	// load any save items
+            if ( i < s.length ) {
+            	if ( s[i].trim().length() > 0 ) {
+            		EditText mText = (EditText) sb.findViewById(R.id.searchTerms);
+            		mText.setText(s[i]);
+    	        
+            		CheckBox chk = (CheckBox) sb.findViewById(R.id.saveTerms);
+            		chk.setChecked(true);
+            	}
+            }
+        	vg.addView(sb, i);
+
         }
+        vg.invalidate();
+    }
+    public void onResume() {
+        super.onResume();
+
+		loadSearchBoxes();
     }
     
     public void onClick(View v) {
@@ -77,23 +111,21 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
 			
 	        String saved = "";
 
-	        for (int i = 0; i < Constants.SEARCH_BOXES; i++) {
-	        	int id = getResources().getIdentifier("searchTerms" + ( i + 1 ), "id", getPackageName());
-	        	if ( DEBUG ) Log.d(TAG, "getting tracking codes for search [" + "searchTerms" + ( i + 1 ) + "] - " + id);
-
-		        mText = (EditText) this.findViewById(id);
+	        for (int i = 0; i < vg.getChildCount(); i++) {
+	        	View sb = vg.getChildAt(i);
+	        	
+		        mText = (EditText) sb.findViewById(R.id.searchTerms);
 		        if ( mText.getText().toString().trim().length() > 0 ) {
 					qValues.add(mText.getText().toString().trim());
 		        	if ( DEBUG ) Log.d(TAG, "adding search item: " + mText.getText().toString().trim());
 
-		        	id = getResources().getIdentifier("saveTerms" + ( i + 1 ), "id", getPackageName());
-					CheckBox chk = (CheckBox) findViewById(id);
+					CheckBox chk = (CheckBox) sb.findViewById(R.id.saveTerms);
 			        if ( chk == null )
 			        	break;
 					if ( chk.isChecked() ) {
 						if ( saved.length() > 0 ) 
 							saved = saved + ",";
-						saved = mText.getText().toString().trim();
+						saved = saved + mText.getText().toString().trim();
 			        	if ( DEBUG ) Log.d(TAG, "adding save item, now = " + saved);
 					}
 		        }
@@ -158,9 +190,10 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
         	if ( DEBUG ) Log.d(TAG, "scanResult: " + contents + " (" + formatName + ")");
         	
         	EditText mText;
-	        for (int i = 0; i < Constants.SEARCH_BOXES; i++) {
-	        	int id = getResources().getIdentifier("searchTerms" + ( i + 1 ), "id", getPackageName());
-		        mText = (EditText) this.findViewById(id);
+	        for (int i = 0; i < vg.getChildCount(); i++) {
+	        	View sb = vg.getChildAt(i);
+	        	
+		        mText = (EditText) sb.findViewById(R.id.searchTerms);
 		        if ( mText.getText().toString().trim().length() == 0 ) {
 		        	mText.setText(contents);
 		        	return;

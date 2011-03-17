@@ -1,8 +1,6 @@
 package nz.net.catalyst.TrackAndTrace;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.ListIterator;
 
 import nz.net.catalyst.TrackAndTrace.Event;
 import android.os.Parcel;
