@@ -46,7 +46,7 @@ public class RSSHandler extends DefaultHandler {
 	private Event currentEvent = new Event();
 
 	// Number of Records added so far
-    ArrayList<Result> Records = new ArrayList<Result>();
+    ArrayList<Result> Records = null;
 
 	// Number of Records to download
 	private static final int RECORDS_LIMIT = 500;
@@ -199,15 +199,16 @@ public class RSSHandler extends DefaultHandler {
 			xr.setContentHandler(this);
 			
 		    URLConnection conn = url.openConnection();
+		    
 		    InputSource is;
-		    		
 		    is = new InputSource(conn.getInputStream());
+		    
+		    Records = new ArrayList<Result>();
 			xr.parse(is);
 			return Records;
 			
 		} catch (IOException e) {
 			Log.e(TAG, "getItems: IOException: " + e.toString());
-			throw new IOException("Connection failed.");
 		} catch (SAXException e) {
 			Log.e(TAG, "getItems: SAXException: " + e.toString());
 		} catch (ParserConfigurationException e) {

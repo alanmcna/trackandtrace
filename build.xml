@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TrackAndTrace"> <!-- default="help" -->
+
+    <!-- The local.properties file is created and updated by the 'android' tool.
+         It contains the path to the SDK. It should *NOT* be checked in in Version
+         Control Systems. -->
+    <property file="local.properties" />
+
+    <!-- The build.properties file can be created by you and is never touched
+         by the 'android' tool. This is the place to change some of the default property values
+         used by the Ant rules.
+         -->
+    <property file="build.properties" />
+
+    <!-- The default.properties file is created and updated by the 'android' tool, as well
+         as ADT.
+         This file is an integral part of the build system for your application and
+         should be checked in in Version Control Systems. -->
+    <property file="default.properties" />
+
+    <!-- Output directory -->
+    <property name="out.dir" value="bin" />
+    <property name="out.absolute.dir" location="${out.dir}" />
+
+    <!-- The release package file to generate -->
+    <property name="out.release.package"
+            location="${out.absolute.dir}/${ant.project.name}-${version}.apk" />
+
+    <!-- Custom Android task to deal with the project target, and import the proper rules.
+         This requires ant 1.6.0 or above. -->
+    <path id="android.antlibs">
+        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/apkbuilder.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/jarutils.jar" />
+    </path>
+
+    <taskdef name="setup"
+        classname="com.android.ant.SetupTask"
+        classpathref="android.antlibs" />
+
+    <!-- Execute the Android Setup task that will set up some properties specific to the target,
+         and import the build rules files.
+
+         The rules file is imported from
+            <SDK>/platforms/<target_platform>/templates/android_rules.xml
+    -->
+    <setup />
+
+    <target name="debug" depends="-prepare-resources">
+        
+        <!-- debug builds should have a snapshot suffix on android:versionName -->
+        <replaceregexp file="AndroidManifest.xml" byline="true"
+                match='android:versionName=".*"'
+                replace='android:versionName="${version}${version.snapshot.suffix}"' />
+        
+        <antcall target="android_rules.debug"/>
+        
+    </target>
+    
+    <target name="release" depends="-prepare-resources">
+        
+        <!-- android:debuggable should be false in release builds -->
+        <replace file="AndroidManifest.xml" summary="true"
+                token='android:debuggable="true"' value='android:debuggable="false"'/>
+        
+        <!-- ensure there isn't a snapshot suffix on android:versionName -->
+        <replaceregexp file="AndroidManifest.xml"
+                match='android:versionName=".*"'
+                replace='android:versionName="${version}"' />
+        
+        <!-- LogConfig.DEBUG and LogConfig.VERBOSE should be false in release builds -->
+        <replaceregexp file="${source.dir}/nz/net/catalyst/TrackAndTrace/Log/LogConfig.java"
+                match="(DEBUG|VERBOSE) = true" replace="\1 = false" flags="g" />
+        
+        <!-- TODO: use secure input (Ant 1.8?) to set key.store.password and key.alias.password
+             before calling android_rules.release so that insecure input won't be used -->
+        
+        <antcall target="android_rules.release" />
+    </target>
+    
+    <target name="-prepare-resources">
+        
+        <!-- use the release API key -->
+        <copy file="${apikey}"
+                tofile="${resource.dir}/values/apikey.xml"
+                overwrite="true" />
+
+        <!-- copy the resource files to our build directory so we are free to modify them -->
+        <copy todir="${resource.dir}">
+            <fileset dir="${resource.orig.dir}" />
+        </copy>
+    	
+    </target>
+
+</project>

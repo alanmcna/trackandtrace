@@ -7,8 +7,7 @@
 >		
 		<EditText android:text=""
 					  android:id="@+id/searchTerms"
-					  android:singleLine="false"
-					  android:drawableLeft="@drawable/track"
+					  android:singleLine="true"
 					  android:layout_weight="1"
 					  android:layout_width="wrap_content"
 					  android:layout_height="wrap_content" 
@@ -16,7 +15,6 @@
 		<CheckBox 
 					  android:id="@+id/saveTerms"
 					  android:layout_width="wrap_content"
-					  android:singleLine="false"
 					  android:layout_height="wrap_content"
 					  android:layout_gravity="center_vertical|right" 
 					  android:layout_weight="0"

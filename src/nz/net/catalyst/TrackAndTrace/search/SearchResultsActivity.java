@@ -89,7 +89,7 @@ public class SearchResultsActivity extends Activity {
 
     	String mURL = mPrefs.getString(getResources().getString(R.string.pref_base_url_key).toString(),
 				getResources().getString(R.string.base_url).toString());
-    	mURL = mURL + Constants.API_KEY + "/" + getLocalIpAddress() + "/";
+    	mURL = mURL + getResources().getString(R.string.api_key).toString() + "/" + getLocalIpAddress() + "/";
 		
     	String qStr = "";
 		Iterator<String> qItr = qValues.iterator(); 
@@ -141,7 +141,6 @@ public class SearchResultsActivity extends Activity {
 		} catch (IOException e) {
 			Log.e(TAG, "Connection error: " + e.getMessage());
 		}
-
         sendResult(results, elv, handler, context);
 	}
     private static void sendResult(final ArrayList<Result> result, final ExpandableListView listview, final Handler handler, final Context context) {
@@ -161,11 +160,19 @@ public class SearchResultsActivity extends Activity {
 		hideProgress();
         // Initialize the adapter with blank groups and children
         // We will be adding children on a thread, and then update the ListView
+		
+		if ( results == null ) {
+			Toast.makeText(this, getResources().getString(R.string.search_failure), 
+					Toast.LENGTH_SHORT).show();
+			finish();
+			return;
+		}
 
 		if ( results.isEmpty() ) {
 			Toast.makeText(this, getResources().getString(R.string.search_no_results), 
 					Toast.LENGTH_SHORT).show();
 			finish();
+			return;
 		}
 		
 		for (Iterator<Result> it = results.iterator(); it.hasNext(); ) { 
