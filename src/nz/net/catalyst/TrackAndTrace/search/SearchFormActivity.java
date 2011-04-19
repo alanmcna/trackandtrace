@@ -190,7 +190,7 @@ public class SearchFormActivity extends Activity implements OnClickListener, Han
 
 		menu.add(Menu.NONE, Constants.SCAN, 1, R.string.menu_scan).setIcon(R.drawable.ic_menu_scan);
 		menu.add(Menu.NONE, Constants.PREFERENCES, 2, R.string.menu_preferences).setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(Menu.NONE, Constants.POSTCODE, 2, R.string.menu_postcode).setIcon(android.R.drawable.ic_menu_view);
+		menu.add(Menu.NONE, Constants.POSTCODE, 3, R.string.menu_postcode).setIcon(android.R.drawable.ic_menu_view);
 		return result;
 	}
 	
@@ -280,22 +280,6 @@ public class SearchFormActivity extends Activity implements OnClickListener, Han
         };
         t.start();
         return t;
-    }
-    /**
-     * Shows the progress UI for a lengthy operation.
-     */
-    protected void showProgress() {
-        showDialog(0);
-    }
-    /**
-     * Hides the progress UI for a lengthy operation.
-     */
-    protected void hideProgress() {
-    	try {
-    		dismissDialog(0);
-    	} catch ( IllegalArgumentException e ) {
-    		// do nothing .. must have gone by itself.
-    	}
     }
 	public boolean addListeners() {
 		if ( ( locationmanager != null) && (listener != null) ) 
