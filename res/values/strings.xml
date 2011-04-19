@@ -13,6 +13,7 @@
     <string name="menu_logout">Logout</string>
     <string name="menu_reset">Reset</string>
     <string name="menu_scan">Scan</string>
+    <string name="menu_postcode">Postcode</string>
     
     <string name="prefcat_advanced">Advanced</string>
     <string name="prefcat_debug">Debugging</string>
@@ -41,6 +42,9 @@
     <string name="search_no_results">Sorry the search returned no results.</string>
     <string name="search_no_search_terms">Sorry, no search terms entered.</string>
     <string name="scan_no_free_input_field">Sorry there are no free input fields to put the scan results.</string>
+    
+    <string name="no_location">Sorry not location fix. Please ensure you have location services enabled and try again later.</string>
+    <string name="postcode_found">Your postcode is \'%s\'.</string>
         
     <string name="load_config_download_error">Sorry there was an error downloading the configuration file.</string>
     <string name="load_config_error">Sorry there was an error parsing the configuration file.</string>

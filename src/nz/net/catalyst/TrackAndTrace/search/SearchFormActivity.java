@@ -1,6 +1,8 @@
 package nz.net.catalyst.TrackAndTrace.search;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import nz.net.catalyst.TrackAndTrace.R;
 import nz.net.catalyst.TrackAndTrace.Constants;
@@ -11,8 +13,14 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +34,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class SearchFormActivity extends Activity implements OnClickListener  {
+public class SearchFormActivity extends Activity implements OnClickListener, Handler.Callback {
 	static final String TAG = LogConfig.getLogTag(SearchFormActivity.class);
 	// whether DEBUG level logging is enabled (whether globally, or explicitly
 	// for this log tag)
@@ -34,10 +42,18 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
 	// whether VERBOSE level logging is enabled
 	static final boolean VERBOSE = LogConfig.VERBOSE;
 	
-	int boxes;
-	ViewGroup vg;
+	// package scope to allow efficient access by inner classes
+	final Handler mHandler = new Handler(this);
+	private Thread mSearchThread;
+
+	// Location info
+	private LocationManager locationmanager = null;
+	private LocationListener listener;
+
+	private int boxes;
+	private ViewGroup vg;
 	
-	SharedPreferences mPrefs;
+	private SharedPreferences mPrefs;
 	
 	private void initiateScan () {
 		try {
@@ -62,6 +78,17 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
 
         loadSearchBoxes();
     }
+	@Override
+	protected void onPause() {
+		super.onPause();
+		removeListeners();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		removeListeners();
+	}
     
     private void loadSearchBoxes() {
         boxes = Integer.parseInt(mPrefs.getString(getString(R.string.pref_search_boxes_key), 
@@ -163,6 +190,7 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
 
 		menu.add(Menu.NONE, Constants.SCAN, 1, R.string.menu_scan).setIcon(R.drawable.ic_menu_scan);
 		menu.add(Menu.NONE, Constants.PREFERENCES, 2, R.string.menu_preferences).setIcon(android.R.drawable.ic_menu_preferences);
+		menu.add(Menu.NONE, Constants.POSTCODE, 2, R.string.menu_postcode).setIcon(android.R.drawable.ic_menu_view);
 		return result;
 	}
 	
@@ -175,7 +203,9 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
 				break;				
 			case Constants.PREFERENCES:
 				startActivity(new Intent(this, EditPreferences.class));
-				break;				
+				break;	
+			case Constants.POSTCODE:
+				addListeners();
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -201,5 +231,136 @@ public class SearchFormActivity extends Activity implements OnClickListener  {
 	        }
         	Toast.makeText(this, getResources().getString(R.string.scan_no_free_input_field), Toast.LENGTH_SHORT).show();
 		} 
+	}
+    public static Thread findPostcode(final double mLatitude, final double mLongitude, final Handler handler, final Context context) {
+        final Runnable runnable = new Runnable() {
+            public void run() {
+
+				Geocoder geocoder = new Geocoder(context);
+				try {
+	
+					if (VERBOSE)
+						Log.v(TAG, "Looking up address of (" + mLatitude + ", "
+								+ mLongitude + ") using Geocoder");
+	
+					List<Address> addresses = geocoder.getFromLocation(mLatitude, mLongitude, 1);
+	
+					// addresses should only contain one address (or none). Send it
+					// to the UI thread
+					if (addresses.size() > 0) {
+	
+						Address address = addresses.get(0);
+	
+						if (VERBOSE)
+							Log.v(TAG, "Geocoder found address: " + address);
+	
+						Message msg = handler.obtainMessage(
+									Constants.GEOCODER_LOOKUP_RESULT, address.getPostalCode());
+						handler.sendMessage(msg);
+					}
+	
+				} catch (IOException e) {
+					Log.i(TAG, "IO error obtaining address from geocoder", e);
+				}
+            }
+        };
+        // run on background thread.
+        return SearchFormActivity.performOnBackgroundThread(runnable);
+    }
+    public static Thread performOnBackgroundThread(final Runnable runnable) {
+        final Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } finally {
+
+                }
+            }
+        };
+        t.start();
+        return t;
+    }
+    /**
+     * Shows the progress UI for a lengthy operation.
+     */
+    protected void showProgress() {
+        showDialog(0);
+    }
+    /**
+     * Hides the progress UI for a lengthy operation.
+     */
+    protected void hideProgress() {
+    	try {
+    		dismissDialog(0);
+    	} catch ( IllegalArgumentException e ) {
+    		// do nothing .. must have gone by itself.
+    	}
+    }
+	public boolean addListeners() {
+		if ( ( locationmanager != null) && (listener != null) ) 
+			return true;
+		
+		String location_context = Context.LOCATION_SERVICE;
+		locationmanager = (LocationManager) getSystemService(location_context);
+		if (! locationmanager.isProviderEnabled(LocationManager.GPS_PROVIDER) && 
+			! locationmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ) {
+        	Toast.makeText(this, getResources().getString(R.string.no_location), Toast.LENGTH_SHORT).show();
+			return false;
+		}
+		listener = new LocationListener() {
+			public void onLocationChanged(Location location) {
+				// keep checking the location, until we have what we need
+				if ( location.hasAccuracy() ) {
+					Message msg = mHandler.obtainMessage(
+							Constants.LOCATION_FOUND, location);
+					mHandler.sendMessage(msg);
+				}
+			}
+
+			public void onProviderDisabled(String provider) {
+			}
+
+			public void onProviderEnabled(String provider) {
+			}
+
+			public void onStatusChanged(String provider, int status,
+					Bundle extras) {
+			}
+		};
+		locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100000, 100, listener);
+		locationmanager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100000, 1000, listener);
+		return true;
+	}
+	public void removeListeners() {
+		// Log.e(LOG_TAG, "removeListeners");
+		if ((locationmanager != null) && (listener != null)) {
+			locationmanager.removeUpdates(listener);
+		}
+		locationmanager = null;
+		// Log.d(LOG_TAG, "Removed " + listener.toString());
+	}
+
+	@Override
+	public boolean handleMessage(Message msg) {
+		switch (msg.what) {
+		case Constants.LOCATION_FOUND:
+			Location mLocation = (Location) msg.obj;
+			mSearchThread =	findPostcode(mLocation.getLatitude(), 
+					 mLocation.getLongitude(), mHandler, this);
+			break;
+		case Constants.GEOCODER_LOOKUP_RESULT:
+			Toast.makeText(SearchFormActivity.this, 
+						getResources().getString(R.string.postcode_found, (CharSequence) msg.obj),
+						Toast.LENGTH_LONG).show();
+			removeListeners();
+			break;
+		default:
+			// the message hasn't been handled
+			return false;
+		}
+
+		// we have handled the message
+		return true;
 	}
 }

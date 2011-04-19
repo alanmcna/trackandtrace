@@ -59,7 +59,7 @@ public class SearchResultsActivity extends Activity {
 	private Thread mSearchThread;
     private final Handler mHandler = new Handler();
     
-	ExpandableListAdapter adapter = new ExpandableListAdapter(this, new ArrayList<String>(), 
+	private MyExpandableListAdapter adapter = new MyExpandableListAdapter(this, new ArrayList<String>(), 
 			new ArrayList<ArrayList<Result>>());
 	
     /** Called when the activity is first created. */
@@ -261,7 +261,7 @@ public class SearchResultsActivity extends Activity {
       listview.setAdapter(adapter);
     }
 
-	public class ExpandableListAdapter extends BaseExpandableListAdapter {
+	public class MyExpandableListAdapter extends BaseExpandableListAdapter {
 
 	    @Override
 	    public boolean areAllItemsEnabled()
@@ -275,7 +275,7 @@ public class SearchResultsActivity extends Activity {
 
 	    private ArrayList<ArrayList<Result>> children;
 
-	    public ExpandableListAdapter(Context context, ArrayList<String> groups,
+	    public MyExpandableListAdapter(Context context, ArrayList<String> groups,
 	            ArrayList<ArrayList<Result>> children) {
 	        this.context = context;
 	        this.groups = groups;
